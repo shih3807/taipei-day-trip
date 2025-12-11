@@ -186,7 +186,9 @@ async def attractions(request:Request,page:int =0, category:str| None=None, keyw
             data = add_images(information)
 
             if not data:
-                print("{'message':'沒有符合搜索的結果'}")
+                return JSONResponse(
+                    status_code=200, content={"message": "沒有符合搜索的結果"}
+                )
 
             # Next Page
             cursor.execute("SELECT COUNT(*) FROM attractions")
