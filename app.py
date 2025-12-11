@@ -35,38 +35,40 @@ async def booking(request: Request):
 async def thankyou(request: Request):
 	return FileResponse("./static/thankyou.html", media_type="text/html")
 
+
+def add_images(information):
+    if information:
+        data = []
+        for row in information:
+            id, name, CAT, description, address, transport, mrt, lat, lng = row
+
+            cursor.execute(
+                "SELECT url FROM attraction_images WHERE attraction_id = %s", (id,)
+            )
+            urls = cursor.fetchall()
+            images = []
+            for url in urls:
+                images.append(url[0])  # type: ignore
+
+            result = {
+                "id": id,
+                "name": name,
+                "category": CAT,
+                "description": description,
+                "address": address,
+                "transport": transport,
+                "mrt": mrt,
+                "lat": lat,
+                "lng": lng,
+                "images": images,
+            }
+            data.append(result)
+        return data
+
+
 @app.get("/api/attractions")
 async def attractions(request:Request,page:int =0, category:str| None=None, keyword:str| None=None):
     try:
-        def add_images(information):
-            if information:
-                data = []
-                for row in information:
-                    id, name, CAT, description, address, transport, mrt, lat, lng = row
-
-                    cursor.execute(
-						"SELECT url FROM attraction_images WHERE attraction_id = %s", (id,)
-					)
-                    urls = cursor.fetchall()
-                    images = []
-                    for url in urls:
-                        images.append(url[0])  # type: ignore
-
-                    result = {
-						"id": id,
-						"name": name,
-						"category": CAT,
-						"description": description,
-						"address": address,
-						"transport": transport,
-						"mrt": mrt,
-						"lat": lat,
-						"lng": lng,
-						"images": images,
-					}
-                    data.append(result)
-                return data
-
         # category AND keyword
         first_page = 0
         page_limit = 8
@@ -198,5 +200,70 @@ async def attractions(request:Request,page:int =0, category:str| None=None, keyw
                 status_code=200, content={"nextPage": nextPage, "data": data}
             )
 
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": e})
+
+@app.get("/api/attraction/{attractionID}")
+async def attraction_id(request: Request, attractionID: int):
+    try:
+        if attractionID:
+            cursor.execute(
+                "SELECT id,name, CAT, description, address, direction, MRT, latitude, longitude FROM attractions WHERE id = %s",
+                (attractionID,),
+            )
+            information = cursor.fetchall()
+            data = add_images(information)
+
+            if not data:
+                return JSONResponse(
+                    status_code=400,
+                    content={"error": True, "message": "沒有符合搜索的結果"},
+                )
+
+            return JSONResponse(
+                status_code=200,
+                content={"data": data},
+            )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": e})
+
+
+@app.get("/api/categories")
+async def categories(request: Request):
+    try:
+        cursor.execute("SELECT DISTINCT CAT FROM attractions ORDER BY CAT DESC")
+        CAT = cursor.fetchall()
+        data=[]
+        for row in CAT:
+            data.append(str(row[0])) # type: ignore
+
+        return JSONResponse(
+            status_code=200,
+            content={"data":data},
+        )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": e})
+
+
+@app.get("/api/mrts")
+async def mrts(request: Request):
+    try:
+        cursor.execute(
+            "SELECT MRT, COUNT(*) AS number_of_attractions "
+            "FROM attractions "
+            "WHERE MRT IS NOT Null "
+            "GROUP BY MRT "
+            "ORDER BY number_of_attractions DESC"
+        )
+
+        MRT= cursor.fetchall()
+        data=[]
+        for row in MRT:
+            data.append(str(row[0])) # type: ignore
+
+        return JSONResponse(
+            status_code=200,
+            content={"data": data},
+        )
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": e})
