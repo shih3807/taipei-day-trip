@@ -103,7 +103,7 @@ async def attractions(request:Request,page:int =0, category:str| None=None, keyw
             total_pages = math.ceil(total_information / page_limit)  # type: ignore
             last_page = first_page + (total_pages -1)
             next_page = page +1 
-            nextPage = next_page if next_page < last_page else None
+            nextPage = next_page if next_page <= last_page else None
 
             return JSONResponse(
                 status_code=200,
@@ -135,7 +135,7 @@ async def attractions(request:Request,page:int =0, category:str| None=None, keyw
             total_pages = math.ceil(total_information / page_limit)  # type: ignore
             last_page = first_page + (total_pages - 1)
             next_page = page + 1
-            nextPage = next_page if next_page < last_page else None
+            nextPage = next_page if next_page <= last_page else None
 
             return JSONResponse(
                 status_code=200,
@@ -168,7 +168,7 @@ async def attractions(request:Request,page:int =0, category:str| None=None, keyw
             total_pages = math.ceil(total_information / page_limit)  # type: ignore
             last_page = first_page + (total_pages - 1)
             next_page = page + 1
-            nextPage = next_page if next_page < last_page else None
+            nextPage = next_page if next_page <= last_page else None
 
             return JSONResponse(
                 status_code=200,
@@ -196,7 +196,7 @@ async def attractions(request:Request,page:int =0, category:str| None=None, keyw
             total_pages = math.ceil(total_information / page_limit)  # type: ignore
             last_page = first_page + (total_pages - 1)
             next_page = page + 1
-            nextPage = next_page if next_page < last_page else None
+            nextPage = next_page if next_page <= last_page else None
 
             return JSONResponse(
                 status_code=200, content={"nextPage": nextPage, "data": data}
@@ -214,7 +214,29 @@ async def attraction_id(request: Request, attractionID: int):
                 (attractionID,),
             )
             information = cursor.fetchall()
-            data = add_images(information)
+            id, name, CAT, description, address, transport, mrt, lat, lng = information[0]
+
+            cursor.execute(
+                "SELECT url FROM attraction_images WHERE attraction_id = %s", (id,)  # type: ignore
+            )
+
+            urls = cursor.fetchall()
+            images = []
+            for url in urls:
+                images.append(url[0])  # type: ignore
+
+            data = {
+                "id": id,
+                "name": name,
+                "category": CAT,
+                "description": description,
+                "address": address,
+                "transport": transport,
+                "mrt": mrt,
+                "lat": lat,
+                "lng": lng,
+                "images": images,
+            }
 
             if not data:
                 return JSONResponse(
