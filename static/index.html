@@ -3,9 +3,164 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Index</title>
+  <title>台北一日遊</title>
+  <!-- 字型 -->
+  <link rel="icon" href="/static/image/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- 樣式表 -->
+  <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-  
+  <!-- navigation -->
+  <div class="nav">
+    <div class="nav_div">
+      <div class="nav_div_title">
+        台北一日遊
+      </div>
+      <div class="nav_div_container">
+        <button class="nav_div_container_button_plan">
+          <div class="nav_div_container_button_text_plan">
+            預定行程
+          </div>
+        </button>
+        <button class="nav_div_container_button_login" id="loginBtn">
+          <div class="nav_div_container_button_text_login" >
+            登入/註冊
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- dialog -->
+  <div class="dialog" id="dialogLogin">
+      <div class="dialog_decorator"></div>
+      <div class="dialog_main">
+        <button class="dialog_close_btn" id="dialogLoginCloseBtn">
+          <img src="/static/image/close.png" class="dialog_close_btn_img">
+        </button>
+        <div class="dialog_main_title">
+          登入會員帳號
+        </div>
+        <div class="dialog_main_containeer">
+          <form>
+            <input class="dialog_main_containeer_form_email" type="text" placeholder="輸入電子信箱">
+            <input class="dialog_main_containeer_form_password" type="password" placeholder="輸入密碼">
+            <button class="dialog_main_containeer_form_submit" type="submit">
+              <div class="dialog_main_containeer_form_submit_text">登入帳戶</div>
+            </button>
+          </form>
+          <div class="dialog_main_containeer_signup">還沒有帳戶？<a id="signupLink">點此註冊</a></div>
+        </div>
+      </div>
+  </div>
+  <div class="dialog" id="dialogSignup">
+    <div class="dialog_decorator"></div>
+    <div class="dialog_main">
+      <button class="dialog_close_btn" id="dialogSogunCloseBtn">
+        <img src="/static/image/close.png" class="dialog_close_btn_img">
+      </button>
+      <div class="dialog_main_title">
+        註冊會員帳號
+      </div>
+      <div class="dialog_main_containeer">
+        <form>
+          <input class="dialog_main_containeer_form_name" type="text" placeholder="輸入電子信箱">
+          <input class="dialog_main_containeer_form_email" type="text" placeholder="輸入電子信箱">
+          <input class="dialog_main_containeer_form_password" type="password" placeholder="輸入密碼">
+          <button class="dialog_main_containeer_form_submit" type="submit">
+            <div class="dialog_main_containeer_form_submit_text">註冊新帳戶</div>
+          </button>
+        </form>
+        <div class="dialog_main_containeer_login">已經有帳戶了？<a id="loginLink">點此登入</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog_overlay" id="dialogOverlay"></div>
+  <!-- header -->
+  <header>
+    <div class="hero">
+      <div class="hero_backgraund">
+        <img src="/static/image/welcome-image.png">
+      </div>
+    </div>
+      <div class="hero_content">
+      <div class="categoryselector">
+        <div class="hero_content_div">
+            <div class="hero_content_div_slogan">
+              <div class="hero_content_div_slogan_title">
+                輕鬆享受台北一日悠閒
+              </div>
+              <div class="hero_content_div_slogan_subtitle">
+                探索每個角落，體驗城市的深度旅遊行程
+              </div>
+            </div>
+            <div class="hero_content_div_search">
+              <div class="hero_content_div_search_searchbar">
+                 
+                  <button class="hero_content_div_search_searchbar_selector" id="categorySelectorBtn">
+                    <div class="hero_content_div_search_searchbar_selector_text" id="categorySelectorBtnText">
+                      全部分類 ▼
+                    </div>
+                  </button>
+                
+                <form class="hero_content_div_search_searchbar_form" id="searchForm">
+                  <input class="hero_content_div_search_searchbar_input"  id="searchInput" type="text" placeholder="輸入景點名稱查詢">
+                  <button type="submit" class="hero_content_div_search_searchbar_btn">
+                      <img class="hero_content_div_search_searchbar_btn_icon" src="/static/image/search.png">
+                  </button>
+                </form>
+            </div>
+          </div>
+        </div>
+        <div class="categoryselector_category" id="categorySelectorPanel">
+          <div class="categoryselector_category_item">
+            <div class="categoryselector_category_item_text">
+              全部分類
+            </div>
+          </div>
+        </div>
+        <div class="categoryselector_overlay" id="categorySelectorOverlay"></div>
+      </div>
+      </div>
+  </header>
+  <!-- main -->
+  <main>
+    <div class="listbar">
+      <div class="listbar_left">
+        <div class="listbar_left_container">
+          <button class="listbar_left_container_btm" id="listbarLeftBtm">
+            <img class="listbar_left_container_icon" src="/static/image/left.png">
+          </button>
+        </div>
+      </div>
+      <div class="listbar_container">
+        <div class="listbar_container_listcontainer" id="listBarListContainer">
+        </div>
+      </div>
+      <div class="listbar_right">
+        <div class="listbar_right_container">
+          <button class="listbar_right_container_btm" id="listbarRightBtm">
+            <img class="listbar_right_container_icon" src="/static/image/right.png">
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="attractionsinfo">
+      <div class="attractionsinfo_attractionsgroup" id="attractionsGroup">
+      </div>
+    </div>
+  </main>
+  <!-- footer -->
+  <footer id="footer">
+    <div class="footer_info">
+        <div class="footer_info_text">
+          COPYRIGHT © 2021 台北一日遊
+        </div>
+    </div>
+  </footer>
+<script src="/static/main.js" defer></script>
 </body>
 </html>
