@@ -924,6 +924,13 @@ footer{
     color: #FFFFFF;
 }
 
+/* width > 1600px */
+@media (min-width: 1600px){
+.hero_backgraund img {
+    width: 100%;
+    height: auto;
+}
+}
 /* Mobile */
 @media (max-width: 1200px){
     .nav_div {

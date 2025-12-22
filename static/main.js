@@ -5,13 +5,13 @@ const listBarListContainer = document.getElementById('listBarListContainer');
 
 listbarRightBtm.addEventListener('click',()=>{
     listBarListContainer.scrollBy({
-        left: 543,
+        left: 200,
         behavior: "smooth"
     });   
 });
 listbarLeftBtm.addEventListener('click',()=>{
     listBarListContainer.scrollBy({
-        left: -543,
+        left: -200,
         behavior: "smooth"
     });   
 });
@@ -24,8 +24,10 @@ let isLoading = false;
 let currentCategory = "";
 let currentKeyword = "";
 
+let attractions = document.querySelectorAll(".attraction");
+
 const attractionsGroup = document.getElementById("attractionsGroup");
-const footer = document.getElementById("footer");
+
 
 
 function addAttraction(attraction) {
@@ -74,6 +76,11 @@ async function loadAttractions() {
         }
 
         result.data.forEach(addAttraction);
+        attractions = document.querySelectorAll(".attraction");
+        if (attractions.length > 0) {
+        observer.observe(attractions[attractions.length - 1]);
+        }
+
         nextPage = result.nextPage;
     } catch (error) {
         console.error("Error loading attractions:", error);
@@ -83,18 +90,21 @@ async function loadAttractions() {
     
 }
 
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-    if (entry.isIntersecting) {
-        loadAttractions();
-    }
-    });
-}, {
+loadAttractions();
+
+const observer = new IntersectionObserver((entries) => {
+  let lastAttraction = entries[0];
+  
+  if (!lastAttraction.isIntersecting) return;
+  observer.unobserve(lastAttraction.target);
+  loadAttractions();
+  
+},{
     rootMargin: "300px",
     threshold:0
 });
 
-observer.observe(footer);
+
 
 
 
@@ -206,7 +216,7 @@ async function loadMRT() {
     } 
 }
 
-loadMRT()
+loadMRT();
 
 
 listBarListContainer.addEventListener("click", (e) => {
@@ -265,3 +275,4 @@ dialogSogunCloseBtn.addEventListener("click", () => {
     dialogSignup.classList.remove("active");
     dialogOverlay.classList.remove("active");
 });
+
