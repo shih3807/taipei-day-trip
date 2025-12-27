@@ -1,11 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Attraction</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>台北一日遊</title>
+<!-- 字型 -->
+<link rel="icon" href="/static/image/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- 樣式表 -->
+<link rel="stylesheet" href="/static/styles.css">  <title>Attraction</title>
 </head>
 <body>
-  
+<!-- navigation -->
+<div class="nav">
+  <div class="nav_div">
+    <div class="nav_div_title">
+      台北一日遊
+    </div>
+    <div class="nav_div_container">
+      <button class="nav_div_container_button_plan">
+        <div class="nav_div_container_button_text_plan">
+          預定行程
+        </div>
+      </button>
+      <button class="nav_div_container_button_login" id="loginBtn">
+        <div class="nav_div_container_button_text_login">
+          登入/註冊
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<!-- dialog -->
+<div class="dialog" id="dialogLogin">
+  <div class="dialog_decorator"></div>
+  <div class="dialog_main">
+    <button class="dialog_close_btn" id="dialogLoginCloseBtn">
+      <img src="/static/image/close.png" class="dialog_close_btn_img">
+    </button>
+    <div class="dialog_main_title">
+      登入會員帳號
+    </div>
+    <div class="dialog_main_containeer">
+      <form>
+        <input class="dialog_main_containeer_form_email" type="text" placeholder="輸入電子信箱">
+        <input class="dialog_main_containeer_form_password" type="password" placeholder="輸入密碼">
+        <button class="dialog_main_containeer_form_submit" type="submit">
+          <div class="dialog_main_containeer_form_submit_text">登入帳戶</div>
+        </button>
+      </form>
+      <div class="dialog_main_containeer_signup">還沒有帳戶？<a id="signupLink">點此註冊</a></div>
+    </div>
+  </div>
+</div>
+<div class="dialog" id="dialogSignup">
+  <div class="dialog_decorator"></div>
+  <div class="dialog_main">
+    <button class="dialog_close_btn" id="dialogSogunCloseBtn">
+      <img src="/static/image/close.png" class="dialog_close_btn_img">
+    </button>
+    <div class="dialog_main_title">
+      註冊會員帳號
+    </div>
+    <div class="dialog_main_containeer">
+      <form>
+        <input class="dialog_main_containeer_form_name" type="text" placeholder="輸入電子信箱">
+        <input class="dialog_main_containeer_form_email" type="text" placeholder="輸入電子信箱">
+        <input class="dialog_main_containeer_form_password" type="password" placeholder="輸入密碼">
+        <button class="dialog_main_containeer_form_submit" type="submit">
+          <div class="dialog_main_containeer_form_submit_text">註冊新帳戶</div>
+        </button>
+      </form>
+      <div class="dialog_main_containeer_login">已經有帳戶了？<a id="loginLink">點此登入</a></div>
+    </div>
+  </div>
+</div>
+<div class="dialog_overlay" id="dialogOverlay"></div>
+<!-- main -->
+<section class="attractionsintroduce">
+  <div class="attractionsintroduce_pic">
+    <button class="attractionsintroduce_pic_left" >
+      <img src="/static/image/left_1.png" />
+    </button>
+    <button class="attractionsintroduce_pic_right" >
+      <img src="/static/image/right_1.png" />
+    </button>
+    <div class="attractionsintroduce_pic_indicator_container">
+    </div>
+  </div>
+  <div class="attractionsintroduce_profile">
+    <div class="attractionsintroduce_profile_name">
+    </div>
+    <div class="attractionsintroduce_profile_tag">
+      <span class="attractionsintroduce_profile_category">
+      </span>
+      <span>
+        at 
+      </span>
+      <span class="attractionsintroduce_profile_MRT">
+      </span>
+    </div>
+    <form class="attractionsintroduce_profile_form" id="attractionsIntroduceProfileForm">
+      <div class="attractionsintroduce_profile_form_title">訂購導覽行程</div>
+      <div class="attractionsintroduce_profile_form_subtitle">以此景點為中心的一日行程，帶您探索城市角落故事</div>
+      <div class="attractionsintroduce_profile_date">
+      <label class="attractionsintroduce_profile_date_lable" for="attractionsIntroduceProfileFormDateInput">選擇日期：</label>
+      <input class="attractionsintroduce_profile_date_imput" id="attractionsIntroduceProfileFormDateInput" type="date">
+      </div>
+      <div class="attractionsintroduce_profile_time">
+        <span class="attractionsintroduce_profile_time_lable" >選擇時間：</span>
+        <label class="attractionsintroduce_profile_time_option">
+          <input
+            type="radio"
+            name="time"
+            id="attractionsIntroduceProfileFormTimeMorning"
+            class="attractionsintroduce_profile_time__input"
+            checked
+          />
+          <span class="attractionsintroduce_profile_time_checkbox"></span>
+          上半天
+        </label>
+        <label class="attractionsintroduce_profile_time_option">
+          <input
+            type="radio"
+            name="time"
+            id="attractionsIntroduceProfileFormTimeAfternoon"
+            class="attractionsintroduce_profile_time__input"
+          />
+          <span class="attractionsintroduce_profile_time_checkbox"></span>
+          下半天
+        </label> 
+      </div>
+      <div class="attractionsintroduce_profile_form_price">
+      <div class="attractionsintroduce_profile_form_price_title">導覽費用：</div><div class="attractionsintroduce_profile_form_price_value">新台幣 2000 元</div>
+      </div>
+      <button type="submit" class="attractionsintroduce_profile_form_btn">
+        <span>開始預約行程<span>
+      </button>
+    </form>
+
+  </div>
+</section>
+<hr>
+<section class="attractiondescription">
+  <div class="attractiondescription_text"></div>
+  <div class="attractiondescription_address_label">景點地址：</div>
+  <div class="attractiondescription_address"></div>
+  <div class="attractiondescription_transport_label">交通方式：</div>
+  <div class="attractiondescription_transport"></div>
+</section>
+
+<!-- footer -->
+<footer id="footer">
+  <div class="footer_info">
+    <div class="footer_info_text">
+      COPYRIGHT © 2021 台北一日遊
+    </div>
+  </div>
+</footer>
+<script src="/static/main.js" defer></script>
 </body>
 </html>
