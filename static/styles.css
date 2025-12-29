@@ -1353,6 +1353,37 @@ hr {
         justify-content: center;
     }
 
+   .attractionsintroduce {
+       width: 100%;
+       height: auto;
+       flex-direction: column;
+       align-items: center;
+   }
+
+    .attractiondescription {
+        width: 100%;
+        padding: 10px 20px 80px 20px;
+    }
+
+    .attractiondescription_text {
+        width: 100%;
+    }
+
+    .attractiondescription_address_label {
+        width: 100%;
+    }
+
+    .attractiondescription_address {
+        width: 100%;
+    }
+
+    .attractiondescription_transport_label {
+        width: 100%;
+    }
+
+    .attractiondescription_transport {
+        width: 100%;
+    }
 }
 
 @media (max-width: 900px) {
@@ -1364,6 +1395,7 @@ hr {
     .hero_content_div_search_searchbar_input {
         width: 100%;
     }
+
 }
 @media (max-width: 600px) {
     .attractionsinfo_attractionsgroup {
@@ -1371,6 +1403,46 @@ hr {
         grid-template-columns: 270px;
     }
     .hero_content_div_search_searchbar_input {
+        width: 100%;
+    }
+
+    .attractionsintroduce {
+        padding: 0;
+    }
+
+    .attractionsintroduce_pic {
+        width: 100%;
+    }
+
+    .attractionsintroduce_pic_indicator_container {
+        width: 100%;
+    }
+
+    .attractionsintroduce_profile_name{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_tag{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_form{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_form_subtitle{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_date{
+        width: 100%;
+    }
+    .attractionsintroduce_profile {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .attractionsintroduce_profile_time {
+        width: 100%;
+    }
+
+    .attractionsintroduce_profile_form_price {
         width: 100%;
     }
 }
