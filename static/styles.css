@@ -61,6 +61,7 @@ input{
     align-items: center;
     position: fixed;
     z-index: 999;
+    box-shadow: 0 1px 0 #e8e8e8dd;
 }
 .nav_div{
     width: 1200px;
@@ -691,7 +692,6 @@ main{
 .listbar_container_listcontainer{
     width: 1086px;
     height: 24px;
-    overflow: hidden;
     display: flex;
     scroll-behavior: smooth;
     overflow-x:auto;
@@ -811,6 +811,7 @@ main{
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-decoration:none;
 }
 .attraction_container{
     width: 270px;
@@ -907,6 +908,7 @@ footer{
     display: flex;
     justify-content: center;
     align-items: center;
+    bottom: 0px;
 }
 .footer_info{
     height: 24px;
@@ -924,8 +926,392 @@ footer{
     color: #FFFFFF;
 }
 
+/* 景點分頁 */
+.attractionsintroduce{
+    width: 1200px;
+    height: 400px;
+    margin-top:94px;
+    margin-bottom: 40px;
+    padding: 0 15px;
+    gap:30px;
+    display: flex;
+}
+.attractionsintroduce_pic{
+    width: 540px;
+    height: 400px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #666666;
+    position: relative;
+}
+.attractionsintroduce_pic_img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+.attractionsintroduce_pic_left{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 10px;
+}
+.attractionsintroduce_pic_left img{
+    opacity: 50%;
+    width: 36px;
+    height: 36px;
+}
+.attractionsintroduce_pic_left:hover{
+background: rgba(255, 255, 255, 0.9);
+}
+.attractionsintroduce_pic_left img:hover {
+    opacity: 1;
+}
+.attractionsintroduce_pic_right{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.75);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    right: 10px;
+}
+.attractionsintroduce_pic_right img {
+    opacity: 50%;
+    width: 36px;
+    height: 36px;
+}
+
+.attractionsintroduce_pic_right:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.attractionsintroduce_pic_right img:hover {
+    opacity: 1;
+}
+.attractionsintroduce_pic_indicator_container {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    display: flex;
+    width: 540px;
+    height: 5px;
+    opacity: 0.75;
+    top: 395px;
+}
+
+.attractionsintroduce_pic_indicator_item {
+    height: 5px;
+    background-color: #FFFFFF;
+    opacity: 0.75;
+    cursor: pointer;
+}
+
+.attractionsintroduce_pic_indicator_item.active {
+    background-color: #000;
+    opacity: 1;
+}
+.attractionsintroduce_profile{
+    width: 600px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 8px;
+}
+.attractionsintroduce_profile_name{
+    width: 600px;
+    height: 33px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 24px;
+    line-height: 33px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+    margin-bottom: 15px;
+}
+.attractionsintroduce_profile_tag{
+    width: 600px;
+    height: 22px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 5px;
+}
+.attractionsintroduce_profile_form{
+    width: 600px;
+    height: 302px;
+    border-radius: 5px;
+    background-color: #E8E8E8;
+    overflow: hidden;
+    padding: 15px 20px 0px 20px;
+    display: flex;
+    flex-direction: column;
+    gap:15px;
+    align-items: start;
+}
+.attractionsintroduce_profile_form_title{
+    width: 560px;
+    height: 22px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.attractionsintroduce_profile_form_subtitle{
+    width: 560px;
+    height: 24px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.attractionsintroduce_profile_date{
+    display: flex;
+    gap:5px;
+    width: 560px;
+    height: 35px;
+    align-items: center;
+}
+.attractionsintroduce_profile_date_lable{
+    width: 81px;
+    height: 17px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 17px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.attractionsintroduce_profile_date_imput{
+    width: 193px;
+    height: 35px;
+    background-color: #FFFFFF;
+    padding: 5px 10px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 35px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+}
+.attractionsintroduce_profile_time{
+    width: 560px;
+    height: 22px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+.attractionsintroduce_profile_time_lable{
+    width: 81px;
+    height: 22px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.attractionsintroduce_profile_time_option{
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 16px;
+    font-size: 16px;
+}
+.attractionsintroduce_profile_time__input{
+    position: absolute;
+    opacity: 0;
+}
+.attractionsintroduce_profile_time_checkbox{
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    position: relative;
+    background-color: #FFFFFF;
+    margin-right: 4px;
+}
+
+.attractionsintroduce_profile_time__input:checked+.attractionsintroduce_profile_time_checkbox::after {
+    content: "";
+    width: 18px;
+    height: 18px;
+    background-color: #448899;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.attractionsintroduce_profile_form_price{
+    width: 560px;
+    height: 22px;
+    display: flex;
+    gap: 5px;
+}
+.attractionsintroduce_profile_form_price_title{
+    font-family: "Noto Sans TC",sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.attractionsintroduce_profile_form_price_value{
+    height: 14px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.attractionsintroduce_profile_form_btn{
+    width: 154px;
+    height: 36px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    background-color: #448899;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+.attractionsintroduce_profile_form_btn span{
+    width: 114px;
+    height: 16px;    
+    color: #FFFFFF;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 19px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    text-align: center;
+    vertical-align: middle;
+}
+hr {
+    width: 100%;
+    border: none;
+    height: 1px;
+    background-color: #E8E8E8;
+    margin: 20px 0;
+    flex-shrink: 0;
+}
+
+.attractiondescription {
+    width: 1200px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    padding: 10px 10px 80px 10px;
+}
+
+.attractiondescription_text {
+    width: 1180px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 25px;
+    letter-spacing: 0%;
+    color: #666666;
+}
+
+.attractiondescription_address_label {
+    width: 1180px;
+    height: 32px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 32px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+    margin-top: 20px;
+}
+
+.attractiondescription_address {
+    width: 1180px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 25px;
+    letter-spacing: 0%;
+    color: #666666;
+}
+
+.attractiondescription_transport_label {
+    width: 1180px;
+    height: 32px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 32px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+    margin-top: 20px;
+}
+
+.attractiondescription_transport {
+    width: 1180px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 25px;
+    letter-spacing: 0%;
+    color: #666666;
+}
+
 /* width > 1600px */
-@media (min-width: 1600px){
+@media (min-width: 1600px) {
 .hero_backgraund img {
     width: 100%;
     height: auto;
@@ -959,6 +1345,7 @@ footer{
 
     .attractionsinfo {
         width: 100%;
+        box-sizing: border-box;
     }
 
     .attractionsinfo_attractionsgroup {
@@ -966,7 +1353,40 @@ footer{
         grid-template-columns: repeat(3, 270px);
         justify-content: center;
     }
+
+   .attractionsintroduce {
+       width: 100%;
+       height: auto;
+       flex-direction: column;
+       align-items: center;
+   }
+
+    .attractiondescription {
+        width: 100%;
+        padding: 10px 20px 80px 20px;
+    }
+
+    .attractiondescription_text {
+        width: 100%;
+    }
+
+    .attractiondescription_address_label {
+        width: 100%;
+    }
+
+    .attractiondescription_address {
+        width: 100%;
+    }
+
+    .attractiondescription_transport_label {
+        width: 100%;
+    }
+
+    .attractiondescription_transport {
+        width: 100%;
+    }
 }
+
 @media (max-width: 900px) {
     .attractionsinfo_attractionsgroup {
         width: 100%;
@@ -976,6 +1396,7 @@ footer{
     .hero_content_div_search_searchbar_input {
         width: 100%;
     }
+
 }
 @media (max-width: 600px) {
     .attractionsinfo_attractionsgroup {
@@ -983,6 +1404,50 @@ footer{
         grid-template-columns: 270px;
     }
     .hero_content_div_search_searchbar_input {
+        width: 100%;
+    }
+    
+    .attraction_container_name{
+        width: 100%;
+    }
+    .attractionsintroduce {
+        padding: 0;
+        margin-top:54px;
+    }
+
+    .attractionsintroduce_pic {
+        width: 100%;
+    }
+
+    .attractionsintroduce_pic_indicator_container {
+        width: 100%;
+    }
+
+    .attractionsintroduce_profile_name{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_tag{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_form{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_form_subtitle{
+        width: 100%;
+    }
+    .attractionsintroduce_profile_date{
+        width: 100%;
+    }
+    .attractionsintroduce_profile {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .attractionsintroduce_profile_time {
+        width: 100%;
+    }
+
+    .attractionsintroduce_profile_form_price {
         width: 100%;
     }
 }
