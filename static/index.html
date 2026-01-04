@@ -43,10 +43,10 @@
         <div class="dialog_main_title">
           登入會員帳號
         </div>
-        <div class="dialog_main_containeer">
-          <form>
-            <input class="dialog_main_containeer_form_email" type="text" placeholder="輸入電子信箱">
-            <input class="dialog_main_containeer_form_password" type="password" placeholder="輸入密碼">
+        <div class="dialog_main_containeer" id="dialogMainContaineerLogin">
+          <form id="loginForm">
+            <input class="dialog_main_containeer_form_email" type="text" id="loginEmail" placeholder="輸入電子信箱">
+            <input class="dialog_main_containeer_form_password" type="password" id="loginPassword" placeholder="輸入密碼">
             <button class="dialog_main_containeer_form_submit" type="submit">
               <div class="dialog_main_containeer_form_submit_text">登入帳戶</div>
             </button>
@@ -58,17 +58,17 @@
   <div class="dialog" id="dialogSignup">
     <div class="dialog_decorator"></div>
     <div class="dialog_main">
-      <button class="dialog_close_btn" id="dialogSogunCloseBtn">
+      <button class="dialog_close_btn" id="dialogSignupCloseBtn">
         <img src="/static/image/close.png" class="dialog_close_btn_img">
       </button>
       <div class="dialog_main_title">
         註冊會員帳號
       </div>
-      <div class="dialog_main_containeer">
-        <form>
-          <input class="dialog_main_containeer_form_name" type="text" placeholder="輸入電子信箱">
-          <input class="dialog_main_containeer_form_email" type="text" placeholder="輸入電子信箱">
-          <input class="dialog_main_containeer_form_password" type="password" placeholder="輸入密碼">
+      <div class="dialog_main_containeer" id="dialogMainContaineerSignup">
+        <form id="signupForm">
+          <input class="dialog_main_containeer_form_name" type="text" id="singupName" placeholder="輸入名字">
+          <input class="dialog_main_containeer_form_email" type="text" id="singupEmail" placeholder="輸入電子信箱">
+          <input class="dialog_main_containeer_form_password" type="password" id="singupPassword" placeholder="輸入密碼">
           <button class="dialog_main_containeer_form_submit" type="submit">
             <div class="dialog_main_containeer_form_submit_text">註冊新帳戶</div>
           </button>

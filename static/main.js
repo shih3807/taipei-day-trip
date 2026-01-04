@@ -1,3 +1,292 @@
+// 1. navigation(login+signup)
+// 2. index.html 效果與渲染
+// 3. attraction.html 效果與渲染
+// 4. 傳送 token
+
+// navigation
+const loginBtn = document.getElementById("loginBtn")
+const loginText = document.querySelector(".nav_div_container_button_text_login")
+const dialogLogin = document.getElementById("dialogLogin")
+const dialogSignup = document.getElementById("dialogSignup")
+const dialogOverlay = document.getElementById("dialogOverlay")
+const signupLink = document.getElementById("signupLink")
+const loginLink = document.getElementById("loginLink")
+const dialogLoginCloseBtn = document.getElementById("dialogLoginCloseBtn")
+const dialogSignupCloseBtn = document.getElementById("dialogSignupCloseBtn")
+const loginForm = document.getElementById("loginForm")
+const loginEmail = document.getElementById("loginEmail")
+const loginPassword = document.getElementById("loginPassword") 
+const signupForm = document.getElementById("signupForm")
+const singupName = document.getElementById("singupName")
+const singupEmail = document.getElementById("singupEmail")
+const singupPassword = document.getElementById("singupPassword")  
+const dialogMainContaineerLogin = document.getElementById("dialogMainContaineerLogin")
+const dialogMainContaineerSignup = document.getElementById("dialogMainContaineerSignup")
+
+let isLoggedIn = false;
+let userId = "";
+let userName = "";
+let userEmail = "";
+
+// 切換登入/登出按鈕
+if(loginBtn){
+loginBtn.addEventListener("click", (e) => {
+    if (isLoggedIn) {
+      logout();
+    } else {
+      openLoginDialog();
+    }
+});
+}
+
+function updateLoginButton() {
+  if (!loginBtn) return;
+
+  if (isLoggedIn) {
+    loginText.textContent = "登出";
+  } else {
+    loginText.textContent = "登入/註冊";
+  }
+}
+
+function openLoginDialog() {
+  dialogLogin.classList.add("active");
+  dialogOverlay.classList.add("active");
+}
+
+// 登出
+function logout() {
+  let answer = confirm('確定要登出嗎？');
+  if(!answer){
+    return
+  }else{
+  localStorage.removeItem("token");
+  location.reload();
+  }
+}
+
+// show dialog
+if(loginLink){
+loginLink.addEventListener("click", (e) => {
+  dialogLogin.classList.toggle("active");
+  dialogSignup.classList.remove("active");
+});
+}
+if(signupLink){
+signupLink.addEventListener("click", (e) => {
+  dialogSignup.classList.toggle("active");
+  dialogLogin.classList.remove("active");
+});
+}
+if(dialogOverlay){
+dialogOverlay.addEventListener("click", () => {
+    signupForm.reset();
+    loginForm.reset();
+    const errorMsgs = document.querySelectorAll(".dialog_main_containeer_msg");
+    errorMsgs.forEach(msg => msg.remove());
+    dialogLogin.classList.remove("active");
+    dialogSignup.classList.remove("active");
+    dialogOverlay.classList.remove("active");
+});
+}
+if(dialogLoginCloseBtn){
+dialogLoginCloseBtn.addEventListener("click", () => {
+    signupForm.reset();
+    loginForm.reset();
+    const errorMsgs = document.querySelectorAll(".dialog_main_containeer_msg");
+    errorMsgs.forEach(msg => msg.remove());
+    dialogLogin.classList.remove("active");
+    dialogSignup.classList.remove("active");
+    dialogOverlay.classList.remove("active");
+});
+}
+if(dialogSignupCloseBtn){
+dialogSignupCloseBtn.addEventListener("click", () => {
+    signupForm.reset();
+    loginForm.reset();
+    const errorMsgs = document.querySelectorAll(".dialog_main_containeer_msg");
+    errorMsgs.forEach(msg => msg.remove());
+    dialogLogin.classList.remove("active");
+    dialogSignup.classList.remove("active");
+    dialogOverlay.classList.remove("active");
+});
+}
+
+// 登入註冊訊息
+function signupErrorMessege(msg){
+  const errorMsg = document.querySelector(".dialog_main_containeer_msg")
+  if(errorMsg){
+    div.textContent = msg;
+    return
+  }
+  const div = document.createElement("div");
+  div.className = "dialog_main_containeer_msg";
+  div.textContent = msg;
+  dialogMainContaineerSignup.appendChild(div);
+}
+
+function loginErrorMessege(msg){
+    const errorMsg = document.querySelector(".dialog_main_containeer_msg")
+    if(errorMsg){
+    div.textContent = msg;
+    return
+  }
+  const div = document.createElement("div");
+  div.className = "dialog_main_containeer_msg";
+  div.textContent = msg;
+  dialogMainContaineerLogin.appendChild(div);
+}
+
+//Authorization
+async function authorization(){
+    try{
+    const url = "/api/user/auth"
+    const res = await fetch(url,{
+      method:"GET",
+      headers:{
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+    });
+    const result = await res.json()
+    data = result.data
+    if (data) {
+      isLoggedIn = true;
+      userId = data.id;
+      userName = data.name;
+      userEmail = data.email;
+      console.log(`isLoggedIn:${isLoggedIn}`)
+      updateLoginButton();
+    } else {
+      isLoggedIn = false;
+      userId = "";
+      userName = "";
+      userEmail = "";
+      updateLoginButton();
+      console.log(`isLoggedIn:${isLoggedIn}`)
+    }
+
+  }catch(error){
+    console.log('authError:',error);
+    isLoggedIn = false;
+    userId = "";
+    userName = "";
+    userEmail = "";
+    updateLoginButton();
+    console.log(`isLoggedIn:${isLoggedIn}`)
+  }
+}
+
+authorization();
+
+
+
+//login
+if (loginForm){
+loginForm.addEventListener("submit",async(e) =>{
+  e.preventDefault();
+  const errorMsg = document.querySelector(".dialog_main_containeer_msg")
+  if(errorMsg){
+    errorMsg.remove();
+  };
+  if (loginEmail.value.trim() === ""){
+    loginErrorMessege("請填入登入信箱")
+    return
+  }
+  if (loginPassword.value.trim() === ""){
+    loginErrorMessege("請填入登入密碼")
+    return
+  }
+  let email = loginEmail.value.trim();
+  let password = loginPassword.value.trim();
+  const data =  {
+  "email": email,
+  "password": password
+  };
+  const jsonString = JSON.stringify(data);
+
+  const url = "/api/user/auth"
+  try{
+    const res = await fetch(url,{
+      method:"PUT",
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:jsonString
+    });
+    const result = await res.json();
+    if(result.error){
+      message = result.message
+      loginErrorMessege(message)
+    };
+    if(result.token){
+      token = result.token
+      localStorage.setItem("token", token);
+      loginForm.reset();
+      alert("登入成功！")
+      location.reload();
+    };
+  }catch(error){
+    console.log('loginError:',error);
+  }
+});
+}
+
+// signup
+if (signupForm){
+signupForm.addEventListener("submit",async(e) =>{
+  e.preventDefault();
+  const errorMsg = document.querySelector(".dialog_main_containeer_msg")
+  if(errorMsg){
+    errorMsg.remove();
+  };
+  if (singupName.value.trim() === ""){
+    signupErrorMessege("請填入註冊姓名")
+    return
+  }
+  if (singupEmail.value.trim() === ""){
+    signupErrorMessege("請填入註冊信箱")
+    return
+  }
+  if (singupPassword.value.trim() === ""){
+    signupErrorMessege("請填入註冊密碼")
+    return
+  }
+  let name = singupName.value.trim();
+  let email = singupEmail.value.trim();
+  let password = singupPassword.value.trim();
+  const data =  {
+  "name": name,
+  "email": email,
+  "password": password
+  };
+  const jsonString = JSON.stringify(data);
+
+  const url = "/api/user"
+  try{
+    const res = await fetch(url,{
+      method:"POST",
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:jsonString
+    });
+    const result = await res.json();
+    if(result.error){
+      message = result.message
+      signupErrorMessege(message)
+    }
+    if(result.ok){
+      signupForm.reset();
+      signupErrorMessege("註冊成功！")
+    }
+  }catch(error){
+    console.log('singupError',error);
+  }
+});
+}
+
+
+// index.html
 // listBar左右滑動按鈕效果
 const listbarRightBtm = document.getElementById('listbarRightBtm');
 const listbarLeftBtm = document.getElementById('listbarLeftBtm');
@@ -16,6 +305,14 @@ listbarLeftBtm.addEventListener('click',()=>{
         behavior: "smooth"
     });   
 });
+}
+
+// listbar 滑鼠滾輪滑動效果
+if(listBarListContainer){
+listBarListContainer.addEventListener("wheel", (e) => {
+  e.preventDefault(); 
+  listBarListContainer.scrollLeft += e.deltaY;
+}, { passive: false });
 }
 
 //attraction
@@ -247,65 +544,8 @@ listBarListContainer.addEventListener("click", (e) => {
 });
 }
 
-// login
-const loginBtn = document.getElementById("loginBtn")
-const dialogLogin = document.getElementById("dialogLogin")
-const dialogSignup = document.getElementById("dialogSignup")
-const dialogOverlay = document.getElementById("dialogOverlay")
-const signupLink = document.getElementById("signupLink")
-const loginLink = document.getElementById("loginLink")
-const dialogLoginCloseBtn = document.getElementById("dialogLoginCloseBtn")
-const dialogSogunCloseBtn = document.getElementById("dialogSogunCloseBtn")
 
-// signin
-if(loginBtn){
-loginBtn.addEventListener("click", (e) => {
-  dialogLogin.classList.toggle("active");
-  dialogOverlay.classList.toggle("active");
-});
-}
-if(loginLink){
-loginLink.addEventListener("click", (e) => {
-  dialogLogin.classList.toggle("active");
-  dialogSignup.classList.remove("active");
-});
-}
-if(signupLink){
-signupLink.addEventListener("click", (e) => {
-  dialogSignup.classList.toggle("active");
-  dialogLogin.classList.remove("active");
-});
-}
-if(dialogOverlay){
-dialogOverlay.addEventListener("click", () => {
-    dialogLogin.classList.remove("active");
-    dialogSignup.classList.remove("active");
-    dialogOverlay.classList.remove("active");
-});
-}
-if(dialogLoginCloseBtn){
-dialogLoginCloseBtn.addEventListener("click", () => {
-    dialogLogin.classList.remove("active");
-    dialogSignup.classList.remove("active");
-    dialogOverlay.classList.remove("active");
-});
-}
-if(dialogSogunCloseBtn){
-dialogSogunCloseBtn.addEventListener("click", () => {
-    dialogLogin.classList.remove("active");
-    dialogSignup.classList.remove("active");
-    dialogOverlay.classList.remove("active");
-});
-}
-
-// listbar 滑鼠滾輪滑動效果
-if(listBarListContainer){
-listBarListContainer.addEventListener("wheel", (e) => {
-  e.preventDefault(); 
-  listBarListContainer.scrollLeft += e.deltaY;
-}, { passive: false });
-}
-
+// attraction.html
 // atraction 分頁，選擇上下半天，價格變化
 const attractionForm = document.getElementById(
   "attractionsIntroduceProfileForm"
