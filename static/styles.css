@@ -42,6 +42,13 @@ button:focus::-moz-focus-inner {
 input{
     cursor: text; 
 }
+.main{
+    /* flex:1; */
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
 
 
 
@@ -75,6 +82,7 @@ input{
     width: 150px;
     height:34px;
     font-family: "Noto Sans TC", sans-serif;
+    text-decoration: none;
     font-weight: 700;
     font-style: Bold;
     font-size: 30px;
@@ -914,17 +922,17 @@ main{
 footer{
     background-color: #757575;
     width: 100%;
+    flex: 1;
     min-width: 330px;
-    height: 104px;
-    padding: 40px 0;
+    min-height: 104px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    bottom: 0px;
 }
 .footer_info{
     height: 24px;
     padding: 5px 0;
+    padding-top: 40px;
+    padding-bottom: 40px;
 }
 .footer_info_text{
     height: 14px;
@@ -1243,7 +1251,7 @@ background: rgba(255, 255, 255, 0.9);
     vertical-align: middle;
 }
 hr {
-    width: 100%;
+    width: 1200px;
     border: none;
     height: 1px;
     background-color: #E8E8E8;
@@ -1322,6 +1330,314 @@ hr {
     color: #666666;
 }
 
+/* booking page */
+.booking_container{
+    width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.headline{
+    width: 1000px;
+    height: 27px;
+    margin-top: 94px;
+    display: flex;
+    align-items: center;
+}
+.headline_text{
+    height: 27px;
+    color: #666666;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 19px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+}
+.booking{
+    width: 980px;
+    height: 200px;
+    margin: 0 10px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+}
+.booking_delete{
+    width: 30px;
+    height: 30px;
+    right: 0;
+    top:0;
+    position: absolute;
+}
+.booking_delete img{
+    width: 30px;
+    height: 30px;
+    opacity: 50%;
+}
+.booking_delete img:hover {
+    opacity: 1;
+}
+
+.booking_img_container{
+    width: 250px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.booking_img_container img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+.booking_information{
+    width: 700px;
+    height: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.booking_information_name{
+    width: 700px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.booking_information_name_text{
+    height: 14px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #448899;
+}
+.booking_information_date{
+    width: 700px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 5px;
+}
+.booking_information_time{
+    width: 700px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 5px;
+}
+.booking_information_price{
+    width: 700px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 5px;
+}
+.booking_information_address{
+    width: 700px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 5px;
+}
+.booking_information_title{
+    height: 14px;
+    font-family:"Noto Sans TC",sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.booking_information_text{
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.booking_form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+.booking_form_info_container{
+    width: 980px;
+    height: 227px;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.booking_form_visa_container{
+    width: 980px;
+    height: 188px;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.booking_form_buttom_container{
+    width: 980px;
+    height: 100px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    gap: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    justify-content: start;
+}
+.booking_form_info, .booking_form_visa{
+    width: 980px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+.booking_form_info_text, .booking_form_visa_text{
+    font-family: "Noto Sans TC" ,sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 19px;
+    line-height: 19px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.booking_form_info_name, .booking_form_info_email, .booking_form_info_phone, .booking_form_visa_number, .booking_form_visa_exp, .booking_form_visa_cvv{
+    width: 980px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+}
+.booking_form_info_name_lable, .booking_form_info_email_lable, .booking_form_info_phone_lable, .booking_form_visa_number_lable, .booking_form_visa_exp_lable, .booking_form_visa_cvv_lable{
+    width: 81px;
+    height: 24px;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.booking_form_info_name_imput, .booking_form_info_email_imput, .booking_form_info_phone_imput, .booking_form_visa_number_imput, .booking_form_visa_exp_imput, .booking_form_visa_cvv_imput{
+    width: 200px;
+    height: 38px;
+    left: 81px;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #FFFFFF;
+    border: 1px solid #E8E8E8;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #000000;
+}
+
+.booking_form_info_remind {
+    width: 608px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.booking_form_info_remind_text {
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 13.3px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+.booking_form_visa_number_imput::placeholder,
+.booking_form_visa_exp_imput::placeholder,
+.booking_form_visa_cvv_imput::placeholder{
+    color: #757575;
+}
+
+.booking_form_price {
+    width: 174px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.booking_form_price_text {
+    height: 14px;
+    font-family: "Noto Sans TC";
+    font-weight: 700;
+    font-style: Bold;
+    font-size: 16px;
+    line-height: 13.3px;
+    letter-spacing: 0%;
+    text-align: right;
+    vertical-align: middle;
+    color: #666666;
+}
+
+.booking_form_btn {
+    width: 173px;
+    height: 36px;
+    border-radius: 5px;
+    padding: 10px 20px;
+    background-color: #448899;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 19px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    text-align: center;
+    vertical-align: middle;
+    color: #FFFFFF;
+}
+
+.booking_none{
+    padding-left:10px;
+    padding-right: 10px;
+    width: 1000px;
+    height: 24px;
+    margin-bottom: 40px;
+}
+.booking_none_text{
+    font-family: "Noto Sans TC",sans-serif;
+    font-weight: 400;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    color: #666666;
+}
+
 /* width > 1600px */
 @media (min-width: 1600px) {
 .hero_backgraund img {
@@ -1330,11 +1646,17 @@ hr {
 }
 }
 /* Mobile */
+/* 平板 */
 @media (max-width: 1200px){
+    hr{
+        width: calc(100% - 20px);
+    }
+    /* nav */
     .nav_div {
         width: 100%;
     }
-
+    
+    /* index */
     .hero_content_div {
         width: 100%;
     }
@@ -1355,6 +1677,7 @@ hr {
         width: 100%;
     }
 
+    /* attraction */
     .attractionsinfo {
         width: 100%;
         box-sizing: border-box;
@@ -1397,6 +1720,117 @@ hr {
     .attractiondescription_transport {
         width: 100%;
     }
+    /* booking */
+    .booking_container {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .headline {
+        width: 100%;
+        height: auto;
+        padding: 0 10px;
+    }
+    .headline_text{
+        line-height: 24px;
+        height: auto;
+    }
+    .booking {
+        width: 100%;
+        height: auto;
+        gap: 30px;
+        margin: 0;
+        padding: 0 10px 30px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+    }
+
+    .booking_delete {
+        right: 10px;
+        bottom: 0;
+        top: auto;
+        position: absolute;
+    }
+
+    .booking_information {
+        width: 100%;
+    }
+    .booking_information_name {
+        width: 100%;
+    }
+    .booking_information_date {
+        width: 100%;
+    }
+
+    .booking_information_time {
+        width: 100%;
+    }
+
+    .booking_information_price {
+        width: 100%;
+    }
+    .booking_information_address {
+        width: 100%;
+        height: auto;
+    }
+
+    .booking_information_text {
+        line-height: 24px;
+        height: auto;
+    }
+
+    .booking_form{
+        width: 100%;
+    }
+    .booking_form_info_container {
+        width: 100%;
+        height: auto;
+        padding: 0 10px;
+    }
+    .booking_form_info_remind {
+        width: 100%;
+        height: auto;
+    }
+
+    .booking_form_info_remind_text {
+        line-height: 24px;
+        margin-top: 5px;
+    }
+
+    .booking_form_visa_container {
+        width: 100%;
+        padding: 0 10px;
+        height: auto;
+    }
+
+    .booking_form_buttom_container {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .booking_form_info,
+    .booking_form_visa {
+        width: 100%;
+    }
+
+    .booking_form_info_name,
+    .booking_form_info_email,
+    .booking_form_info_phone,
+    .booking_form_visa_number,
+    .booking_form_visa_exp,
+    .booking_form_visa_cvv {
+        width: 100%;
+    }
+
+    .booking_form_info_remind {
+        width: 100%;
+    }
+
+    .booking_none {
+        width: 100%;
+    }
 }
 
 @media (max-width: 900px) {
@@ -1410,6 +1844,7 @@ hr {
     }
 
 }
+ /* 手機 */
 @media (max-width: 600px) {
     .attractionsinfo_attractionsgroup {
         width: 100%;
@@ -1460,6 +1895,9 @@ hr {
     }
 
     .attractionsintroduce_profile_form_price {
+        width: 100%;
+    }
+    .booking_img_container {
         width: 100%;
     }
 }

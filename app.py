@@ -16,14 +16,20 @@ app = FastAPI()
 
 load_dotenv()
 
-taipei_day_trip = mysql.connector.connect(
+cnxpool = mysql.connector.pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=5,
     host=os.environ.get("DB_HOST"),
     user=os.environ.get("DB_USER"),
     password=os.environ.get("DB_PASSWORD"),
     database=os.environ.get("DB_NAME"),
+    autocommit=True,
 )
 
-cursor = taipei_day_trip.cursor()
+
+def get_db():
+    return cnxpool.get_connection()
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -51,34 +57,37 @@ async def thankyou(request: Request):
     return FileResponse("./static/thankyou.html", media_type="text/html")
 
 
-def add_images(information):
+def add_images(information, cursor):
     if information:
-        data = []
-        for row in information:
-            id, name, CAT, description, address, transport, mrt, lat, lng = row
+        try:
+            data = []
+            for row in information:
+                id, name, CAT, description, address, transport, mrt, lat, lng = row
 
-            cursor.execute(
-                "SELECT url FROM attraction_images WHERE attraction_id = %s", (id,)
-            )
-            urls = cursor.fetchall()
-            images = []
-            for url in urls:
-                images.append(url[0])  # type: ignore
+                cursor.execute(
+                    "SELECT url FROM attraction_images WHERE attraction_id = %s", (id,)
+                )
+                urls = cursor.fetchall()
+                images = []
+                for url in urls:
+                    images.append(url[0])  # type: ignore
 
-            result = {
-                "id": id,
-                "name": name,
-                "category": CAT,
-                "description": description,
-                "address": address,
-                "transport": transport,
-                "mrt": mrt,
-                "lat": lat,
-                "lng": lng,
-                "images": images,
-            }
-            data.append(result)
-        return data
+                result = {
+                    "id": id,
+                    "name": name,
+                    "category": CAT,
+                    "description": description,
+                    "address": address,
+                    "transport": transport,
+                    "mrt": mrt,
+                    "lat": lat,
+                    "lng": lng,
+                    "images": images,
+                }
+                data.append(result)
+            return data
+        except Exception as e:
+            return print(f"新增圖片錯誤：{str(e)}")
 
 
 @app.get("/api/attractions")
@@ -88,6 +97,9 @@ async def attractions(
     category: str | None = None,
     keyword: str | None = None,
 ):
+    cnx = get_db()
+    cursor = cnx.cursor()
+
     try:
         # category AND keyword
         first_page = 0
@@ -105,7 +117,7 @@ async def attractions(
                 (category, keyword_like, keyword, page_limit, previous_page),
             )
             information = cursor.fetchall()
-            data = add_images(information)
+            data = add_images(information, cursor)
 
             if not data:
                 return JSONResponse(
@@ -139,7 +151,7 @@ async def attractions(
                 (category, page_limit, previous_page),
             )
             information = cursor.fetchall()
-            data = add_images(information)
+            data = add_images(information, cursor)
 
             if not data:
                 return JSONResponse(
@@ -172,7 +184,7 @@ async def attractions(
                 (keyword_like, keyword, page_limit, previous_page),
             )
             information = cursor.fetchall()
-            data = add_images(information)
+            data = add_images(information, cursor)
 
             if not data:
                 return JSONResponse(
@@ -203,7 +215,7 @@ async def attractions(
                 (page_limit, previous_page),
             )
             information = cursor.fetchall()
-            data = add_images(information)
+            data = add_images(information, cursor)
 
             if not data:
                 return JSONResponse(
@@ -225,9 +237,15 @@ async def attractions(
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
+    finally:
+        cursor.close()
+        cnx.close()
+
 
 @app.get("/api/attraction/{attractionID}")
 async def attraction_id(request: Request, attractionID: int):
+    cnx = get_db()
+    cursor = cnx.cursor()
     try:
         if attractionID:
             cursor.execute(
@@ -274,9 +292,15 @@ async def attraction_id(request: Request, attractionID: int):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
+    finally:
+        cursor.close()
+        cnx.close()
+
 
 @app.get("/api/categories")
 async def categories(request: Request):
+    cnx = get_db()
+    cursor = cnx.cursor()
     try:
         cursor.execute("SELECT DISTINCT CAT FROM attractions ORDER BY CAT DESC")
         CAT = cursor.fetchall()
@@ -290,10 +314,15 @@ async def categories(request: Request):
         )
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()
 
 
 @app.get("/api/mrts")
 async def mrts(request: Request):
+    cnx = get_db()
+    cursor = cnx.cursor()
     try:
         cursor.execute(
             "SELECT MRT, COUNT(*) AS number_of_attractions "
@@ -315,6 +344,10 @@ async def mrts(request: Request):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
+    finally:
+        cursor.close()
+        cnx.close()
+
 
 class SingupRequest(BaseModel):
     name: str
@@ -324,6 +357,9 @@ class SingupRequest(BaseModel):
 
 @app.post("/api/user")
 async def singup(request: Request, data: SingupRequest):
+    cnx = get_db()
+    cursor = cnx.cursor()
+
     try:
         name = data.name
         email = data.email.lower()
@@ -346,11 +382,13 @@ async def singup(request: Request, data: SingupRequest):
             "INSERT INTO users(name, email, password) VALUES(%s, %s, %s)",
             (name, email, hash_password.decode("utf-8")),
         )
-        taipei_day_trip.commit()
 
         return JSONResponse(status_code=200, content={"ok": True})
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()
 
 
 class LoginRequest(BaseModel):
@@ -360,6 +398,8 @@ class LoginRequest(BaseModel):
 
 @app.put("/api/user/auth")
 async def login(request: Request, data: LoginRequest):
+    cnx = get_db()
+    cursor = cnx.cursor()
     try:
         email = data.email.lower()
         password = data.password
@@ -400,6 +440,9 @@ async def login(request: Request, data: LoginRequest):
         return JSONResponse(status_code=200, content={"token": token})
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()
 
 
 @app.get("/api/user/auth")
@@ -434,3 +477,194 @@ async def authorization(request: Request):
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+
+@app.get("/api/booking")
+async def get_booking(request: Request):
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+    try:
+        auth_header = request.headers.get("Authorization")
+
+        # 確認是否登入
+        try:
+            if not auth_header:
+                return JSONResponse(
+                    status_code=403,
+                    content={"error": True, "message": "未登入系統，拒絕存取"},
+                )
+
+            # 取得user_id
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, secert, algorithms="HS256")
+            user_id = payload["id"]
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=403,
+                content={"error": True, "message": "未登入系統，拒絕存取"},
+            )
+
+        # 取得booking資料
+        cursor.execute(
+            "SELECT "
+            "attractions.id AS attraction_id,"
+            "attractions.name AS attraction_name,"
+            "attractions.address AS attraction_address,"
+            "attraction_images.url AS image_url,"
+            "booking.date AS date,"
+            "booking.time AS time,"
+            "booking.price AS price "
+            "FROM booking "
+            "INNER JOIN attractions ON booking.attraction_id= attractions.id "
+            "INNER JOIN attraction_images ON attractions.id = attraction_images.attraction_id "
+            "WHERE booking.user_id = %s "
+            "LIMIT 1;",
+            (user_id,),
+        )
+        data = cursor.fetchone()
+        if not data:
+            return JSONResponse(
+                status_code=200,
+                content={"data":None},
+            )
+
+        attraction_id = data["attraction_id"]
+        attraction_name = data["attraction_name"]
+        attraction_address = data["attraction_address"]
+        attraction_image = data["image_url"]
+        date = str(data["date"])
+        time = data["time"]
+        price = data["price"]
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "data": {
+                    "attraction": {
+                        "id": attraction_id,
+                        "name": attraction_name,
+                        "address": attraction_address,
+                        "image": attraction_image,
+                    },
+                    "date": date,
+                    "time": time,
+                    "price": price,
+                }
+            },
+        )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()
+
+
+class postBookingRequest(BaseModel):
+    attractionId: int
+    date: str
+    time: str
+    price: int
+
+
+@app.post("/api/booking")
+async def post_booking(request: Request, data: postBookingRequest):
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+    try:
+        auth_header = request.headers.get("Authorization")
+
+        # 確認是否登入
+        try:
+            if not auth_header:
+                return JSONResponse(
+                    status_code=403,
+                    content={"error": True, "message": "未登入系統，拒絕存取"},
+                )
+
+            # 取得user_id
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, secert, algorithms="HS256")
+            user_id = payload["id"]
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=403,
+                content={"error": True, "message": "未登入系統，拒絕存取"},
+            )
+
+        # 輸入booking資料
+        try:
+            attraction_id = data.attractionId
+            date = data.date
+            time = data.time
+            price = data.price
+
+            cursor.execute(
+                "INSERT INTO "
+                "booking(user_id, attraction_id, date, time, price) "
+                "VALUES (%s, %s, %s, %s, %s) "
+                "ON DUPLICATE KEY UPDATE attraction_id = VALUES(attraction_id),"
+                "date = VALUES(date),"
+                "time = VALUES(time),"
+                "price = VALUES(price);",
+                (user_id, attraction_id, date, time, price),
+            )
+
+            return JSONResponse(
+                status_code=200,
+                content={"ok": True},
+            )
+
+        except Exception as e:
+            return JSONResponse(status_code=400, content={"error": True, "message": str(e)})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()
+
+
+@app.delete("/api/booking")
+async def delete_booking(request: Request):
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+    try:
+        auth_header = request.headers.get("Authorization")
+
+        # 確認是否登入
+        try:
+            if not auth_header:
+                return JSONResponse(
+                    status_code=403,
+                    content={"error": True, "message": "未登入系統，拒絕存取"},
+                )
+
+            # 取得user_id
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, secert, algorithms="HS256")
+            user_id = payload["id"]
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=403,
+                content={"error": True, "message": "未登入系統，拒絕存取"},
+            )
+
+        # 刪除booking資料
+        cursor.execute(
+            "DELETE FROM booking " 
+            "WHERE user_id = %s;",
+            (user_id,),
+        )
+
+        return JSONResponse(
+            status_code=200,
+            content={"ok": True},
+        )
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()

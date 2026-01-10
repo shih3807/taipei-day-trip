@@ -5,6 +5,7 @@
 
 // navigation
 const loginBtn = document.getElementById("loginBtn")
+const bookingBtn = document.getElementById("bookingBtn")
 const loginText = document.querySelector(".nav_div_container_button_text_login")
 const dialogLogin = document.getElementById("dialogLogin")
 const dialogSignup = document.getElementById("dialogSignup")
@@ -156,6 +157,7 @@ async function authorization(){
       userEmail = data.email;
       console.log(`isLoggedIn:${isLoggedIn}`)
       updateLoginButton();
+      return true
     } else {
       isLoggedIn = false;
       userId = "";
@@ -163,6 +165,7 @@ async function authorization(){
       userEmail = "";
       updateLoginButton();
       console.log(`isLoggedIn:${isLoggedIn}`)
+      return false
     }
 
   }catch(error){
@@ -173,11 +176,23 @@ async function authorization(){
     userEmail = "";
     updateLoginButton();
     console.log(`isLoggedIn:${isLoggedIn}`)
+    return false
   }
 }
 
-authorization();
+async function authRender() {
+  const isAuth = await authorization();
+  const bookingPage = window.location.pathname === "/booking";
+  if(bookingPage){
+    if(!isAuth){
+      window.location.href="/"
+      return
+    }
+    renderBooking();
+  }
+}
 
+authRender();
 
 
 //login
@@ -285,6 +300,14 @@ signupForm.addEventListener("submit",async(e) =>{
 });
 }
 
+// bookingBtn
+bookingBtn.addEventListener('click',()=>{
+      if (isLoggedIn) {
+      window.location.href = "/booking";
+    } else {
+      openLoginDialog();
+    }
+  });
 
 // index.html
 // listBar左右滑動按鈕效果
@@ -550,7 +573,9 @@ listBarListContainer.addEventListener("click", (e) => {
 const attractionForm = document.getElementById(
   "attractionsIntroduceProfileForm"
 );
-const morningRadio = document.getElementById(
+
+if(attractionForm){
+  const morningRadio = document.getElementById(
   "attractionsIntroduceProfileFormTimeMorning"
 );
 const afternoonRadio = document.getElementById(
@@ -560,17 +585,80 @@ const priceValue = document.querySelector(
   ".attractionsintroduce_profile_form_price_value"
 );
 
+  morningRadio.addEventListener("change", () => {
+    if (morningRadio.checked) {
+      priceValue.textContent = "新台幣 2000 元";
+    }
+  });
+  afternoonRadio.addEventListener("change", () => {
+    if (afternoonRadio.checked) {
+      priceValue.textContent = "新台幣 2500 元";
+    }
+  });
+}
+
 if(attractionForm){
-morningRadio.addEventListener("change", () => {
-  if (morningRadio.checked) {
-    priceValue.textContent = "新台幣 2000 元";
+  attractionForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  // 先確認有無登入
+  if (!isLoggedIn ){
+    openLoginDialog();
+    return
   }
-});
-afternoonRadio.addEventListener("change", () => {
-  if (afternoonRadio.checked) {
-    priceValue.textContent = "新台幣 2500 元";
+
+  const dateInput = document.getElementById("attractionsIntroduceProfileFormDateInput");
+  const date = dateInput.value;
+
+  // 確認有選日期
+  if (!date) {
+    alert("請先選擇預訂日期");
+    return;
   }
+
+  const time = document.getElementById("attractionsIntroduceProfileFormTimeMorning").checked
+    ? "morning"
+    : "afternoon";
+  const price = time === "morning" ? 2000 : 2500
+
+  const bookingData = {
+    attractionId: attractionId,
+    date: date,
+    time: time,
+    price: price
+  };
+
+  postBooking(bookingData);
+
 });
+};
+
+async function postBooking(data) {
+  url = "/api/booking"
+  try{
+    const res = await fetch(url,{
+      method: "POST",
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify(data)
+    })
+    const result = await res.json()
+    if(result.error){
+      console.log("postBookingError:",error);
+      if(result.message ==="未登入系統，拒絕存取"){
+        openLoginDialog();
+        return
+      }
+      return
+    }
+    if(result.ok){
+      window.location.href = "/booking";
+    }
+  }catch(error){
+    console.log("postBookingError:",error);
+  }
 }
 
 //render attraction page
@@ -680,4 +768,191 @@ function showSlide(index) {
 
   imgElements[currentIndex].style.display = "block";
   indicators[currentIndex].classList.add("active");
+}
+
+
+// render booking page
+  // 取得預定資料
+async function fetchBooking(){
+    try{
+      const url = "/api/booking"
+      const res = await fetch(url,{
+        method:"GET",
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem("token")}`
+        },
+      });
+      const result = await res.json()
+      if(result.error){
+        console.log(`fetchBookingError:${result.message}`)
+        return null
+      }
+      data = result.data
+      return data
+    }catch(error){
+      console.log("fetchBookingError:", error)
+      return null
+    }
+}
+  // 插入預定頁面
+async function bookingHtml() {
+  const data = await fetchBooking()
+  const main = document.querySelector(".main")
+  if (!data){
+    main.innerHTML = `
+    <div class="booking_container">
+      <div class="headline">
+        <div class="headline_text">您好，${userName}，待預定的行程如下：</div>
+      </div>
+      <div class="booking_none">
+        <div class="booking_none_text">目前沒有任何待預訂的行程</div>
+      </div>
+    </div>
+    `
+    return false
+  }
+  const attraction_id = data.attraction.id;
+  const attraction_name = data.attraction.name;
+  const attraction_address = data.attraction.address;
+  const attraction_image = data.attraction.image;
+  const date = data.date;
+  const time = data.time;
+  const price = data.price;
+  main.innerHTML = `
+  <div class="booking_container">
+  <div class="headline"><div class="headline_text">您好，${userName}，待預定的行程如下：</div></div>
+  <div class="booking">
+    <button class="booking_delete" id="bookingDeleteBtn"><img src="/static/image/delete.png"></button>
+    <div class="booking_img_container">
+      <img src="${attraction_image}">
+    </div>
+    <div class="booking_information">
+      <div class="booking_information_name"><div class="booking_information_name_text">台北一日遊：${attraction_name}</div></div>
+      <div class="booking_information_date"><div class="booking_information_title">日期：</div><div class="booking_information_text">${date}</div></div>
+      <div class="booking_information_time"><div class="booking_information_title">時間：</div><div
+          class="booking_information_text">${(time === "morning")? "早上 9 點到中午 12 點":"下午 1 點到下午 4 點"}</div></div>
+      <div class="booking_information_price"><div class="booking_information_title">費用：</div><div
+          class="booking_information_text">新台幣 ${price} 元</div></div>
+      <div class="booking_information_address"><div class="booking_information_title">地點：</div><div
+          class="booking_information_text">${attraction_address}</div></div>
+    </div>
+  </div>
+  </div>
+  <hr>
+  <form class="booking_form" id="booking_form">
+    <div class="booking_form_info_container">
+      <div class="booking_form_info"><div class="booking_form_info_text">您的聯絡資訊</div></div>
+      <div class="booking_form_info_name">
+        <label class="booking_form_info_name_lable" for="bookingFormInfoNameImput">聯絡姓名：</label>
+        <input class="booking_form_info_name_imput" id="bookingFormInfoNameImput" type="text" autocomplete="name">
+      </div>
+      <div class="booking_form_info_email">
+        <label class="booking_form_info_email_lable" for="bookingFormInfoEmailImput">聯絡信箱：</label>
+        <input class="booking_form_info_email_imput" id="bookingFormInfoEmailImput" type="text" autocomplete="email">
+      </div>
+      <div class="booking_form_info_phone">
+        <label class="booking_form_info_phone_lable" for="bookingFormInfoPhoneImput">手機號碼：</label>
+        <input class="booking_form_info_phone_imput" id="bookingFormInfoPhoneImput" type="tel" autocomplete="tel">
+      </div>
+      <div class="booking_form_info_remind">
+        <div class="booking_form_info_remind_text">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</div>
+      </div>
+    </div>
+    <hr>
+    <div class="booking_form_visa_container">
+      <div class="booking_form_visa">
+        <div class="booking_form_visa_text">信用卡付款資訊</div>
+      </div>
+      <div class="booking_form_visa_number">
+        <label class="booking_form_visa_number_lable" for="bookingFormVisaNumberImput">卡片號碼：</label>
+        <input class="booking_form_visa_number_imput" id="bookingFormVisaNumberImput" type="tel" maxlength="19" autocomplete="cc-number" placeholder="**** **** **** ****">
+      </div>
+      <div class="booking_form_visa_exp">
+        <label class="booking_form_visa_exp_lable" for="bookingFormVisaExpImput">過期時間：</label>
+        <input class="booking_form_visa_exp_imput" id="bookingFormVisaExpImput" type="tel"  maxlength="7"
+          autocomplete="cc-exp" placeholder="MM / YY">
+      </div>
+      <div class="booking_form_visa_cvv">
+        <label class="booking_form_visa_cvv_lable" for="bookingFormVisaCvvImput">驗證密碼：</label>
+        <input class="booking_form_visa_cvv_imput" id="bookingFormVisaCvvImput" type="tel" maxlength="4"
+          autocomplete="cc-csc" placeholder="CVV">
+      </div>
+    </div>
+    <hr>
+    <div class="booking_form_buttom_container">
+      <div class="booking_form_price">
+        <div class="booking_form_price_text">總價：新台幣 ${price} 元</div>
+      </div>
+      <button type="submit" class="booking_form_btn">
+        <span>確認訂購並付款<span>
+      </button>
+    </div>
+  </form>
+  `
+  return true
+}
+  //  綁定預定事件
+function bookingEvent(){
+  // exp 輸入設定
+  const expirationInput = document.getElementById("bookingFormVisaExpImput");
+  if (!expirationInput) return;
+  expirationInput.addEventListener("input", (e) => {
+    let value = e.target.value;
+    value = value.replace(/\D/g, "");
+    if (value.length > 7) {
+      value = value.slice(0, 7);
+    }
+    if (value.length >= 3) {
+      value = value.slice(0, 2) + " / " + value.slice(2);
+    }
+    e.target.value = value;
+  });
+  // 刪除按鈕
+    const bookingDeleteBtn = document.getElementById("bookingDeleteBtn");
+    if (!bookingDeleteBtn) return;
+    bookingDeleteBtn.addEventListener("click", () => {
+      if (!isLoggedIn ){
+      openLoginDialog();
+      return
+      }
+      deleteBooking();
+    });
+
+}
+  // 渲染預定畫面
+async function renderBooking(){
+  const booked = await bookingHtml()
+  if(booked){
+    bookingEvent();
+  } 
+}
+
+// 刪除預定資料
+async function deleteBooking() {
+  url = "/api/booking"
+  try{
+    const res = await fetch(url,{
+      method: "DELETE",
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+    })
+    const result = await res.json()
+    if(result.error){
+      console.log("deleteBookingError:",error);
+      if(result.message ==="未登入系統，拒絕存取"){
+        openLoginDialog();
+        return
+      }
+      return
+    }
+    if(result.ok){
+      alert = "預定已刪除"
+      location.reload();
+    }
+  }catch(error){
+    console.log("deleteBookingError:",error);
+  }
+  
 }
