@@ -1,11 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thank You</title>
+  <title>台北一日遊</title>
+  <!-- 字型 -->
+  <link rel="icon" href="/static/image/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- 樣式表 -->
+  <link rel="stylesheet" href="/static/styles.css">
+  <title>Attraction</title>
 </head>
+
 <body>
-  
+  <!-- navigation -->
+  <div class="nav">
+    <div class="nav_div">
+      <a class="nav_div_title" href="/">
+        台北一日遊
+      </a>
+      <div class="nav_div_container">
+        <button class="nav_div_container_button_plan" id="bookingBtn">
+          <div class="nav_div_container_button_text_plan">
+            預定行程
+          </div>
+        </button>
+        <button class="nav_div_container_button_login" id="loginBtn">
+          <div class="nav_div_container_button_text_login">
+            登入/註冊
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- dialog -->
+  <div class="dialog" id="dialogLogin">
+    <div class="dialog_decorator"></div>
+    <div class="dialog_main">
+      <button class="dialog_close_btn" id="dialogLoginCloseBtn">
+        <img src="/static/image/close.png" class="dialog_close_btn_img">
+      </button>
+      <div class="dialog_main_title">
+        登入會員帳號
+      </div>
+      <div class="dialog_main_containeer" id="dialogMainContaineerLogin">
+        <form id="loginForm">
+          <input class="dialog_main_containeer_form_email" type="text" id="loginEmail" placeholder="輸入電子信箱">
+          <input class="dialog_main_containeer_form_password" type="password" id="loginPassword" placeholder="輸入密碼">
+          <button class="dialog_main_containeer_form_submit" type="submit">
+            <div class="dialog_main_containeer_form_submit_text">登入帳戶</div>
+          </button>
+        </form>
+        <div class="dialog_main_containeer_signup">還沒有帳戶？<a id="signupLink">點此註冊</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="dialog" id="dialogSignup">
+    <div class="dialog_decorator"></div>
+    <div class="dialog_main">
+      <button class="dialog_close_btn" id="dialogSignupCloseBtn">
+        <img src="/static/image/close.png" class="dialog_close_btn_img">
+      </button>
+      <div class="dialog_main_title">
+        註冊會員帳號
+      </div>
+      <div class="dialog_main_containeer" id="dialogMainContaineerSignup">
+        <form id="signupForm">
+          <input class="dialog_main_containeer_form_name" type="text" id="singupName" placeholder="輸入名字">
+          <input class="dialog_main_containeer_form_email" type="text" id="singupEmail" placeholder="輸入電子信箱">
+          <input class="dialog_main_containeer_form_password" type="password" id="singupPassword" placeholder="輸入密碼">
+          <button class="dialog_main_containeer_form_submit" type="submit">
+            <div class="dialog_main_containeer_form_submit_text">註冊新帳戶</div>
+          </button>
+        </form>
+        <div class="dialog_main_containeer_login">已經有帳戶了？<a id="loginLink">點此登入</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog_overlay" id="dialogOverlay"></div>
+
+  <!-- main -->
+  <div class="main">
+    <div class="thankyou_container">
+      <div class="thankyou">感謝您的訂購</div>
+      <div class="thankyou">您的訂購編號如下：</div>
+      <div class="thankyou_ordernumber">查無訂單</div>
+      <button class="thankyou_btn">返回首頁</button>
+    </div>
+  </div>
+  <!-- footer -->
+
+  <footer id="footer">
+    <div class="footer_info">
+      <div class="footer_info_text">
+        COPYRIGHT © 2021 台北一日遊
+      </div>
+    </div>
+  </footer>
+  <script src="/static/main.js" defer></script>
 </body>
+
 </html>
