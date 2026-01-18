@@ -11,6 +11,7 @@ import datetime
 from pydantic import BaseModel
 import bcrypt
 import jwt
+import requests
 
 app = FastAPI()
 
@@ -665,6 +666,258 @@ async def delete_booking(request: Request):
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+    finally:
+        cursor.close()
+        cnx.close()
+
+
+class AttractionModel(BaseModel):
+    id: int
+    name: str
+    address: str
+    image: str
+
+
+class TripModel(BaseModel):
+    attraction: AttractionModel
+    date: str
+    time: str
+
+
+class ContactModel(BaseModel):
+    name: str
+    email: str
+    phone: str
+
+
+class OrderModel(BaseModel):
+    price: int
+    trip: TripModel
+    contact: ContactModel
+
+
+class OrderRequest(BaseModel):
+    prime: str
+    order: OrderModel
+
+
+@app.post("/api/orders")
+async def create_order(request: Request, data: OrderRequest):
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+    try:
+        auth_header = request.headers.get("Authorization")
+
+        # 確認是否登入
+        try:
+            if not auth_header:
+                return JSONResponse(
+                    status_code=403,
+                    content={"error": True, "message": "未登入系統，拒絕存取"},
+                )
+
+            # 取得user_id
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, secert, algorithms="HS256")
+            user_id = payload["id"]
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=403,
+                content={"error": True, "message": "未登入系統，拒絕存取"},
+            )
+
+        try:
+            # 產生訂單編號（userId + timestamp）
+            order_number = f"{user_id}{int(datetime.datetime.now().timestamp())}"
+
+            # 建立 UNPAID 訂單
+            cursor.execute(
+                """
+                INSERT INTO orders
+                (order_number, user_id, attraction_id, price, date, time,
+                contact_name, contact_email, contact_phone, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'UNPAID')
+                """,
+                (
+                    order_number,
+                    user_id,
+                    data.order.trip.attraction.id,
+                    data.order.price,
+                    data.order.trip.date,
+                    data.order.trip.time,
+                    data.order.contact.name,
+                    data.order.contact.email,
+                    data.order.contact.phone,
+                ),
+            )
+
+            order_id = cursor.lastrowid
+        except Exception as e:
+            return JSONResponse(
+                status_code=400,
+                content={"error": True, "message": "訂單建立失敗"},
+            )
+
+        # TapPay API
+        tappay_url = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
+
+        tappay_payload = {
+            "prime": data.prime,
+            "partner_key": os.environ.get("partner_key"),
+            "merchant_id": os.environ.get("merchant_id"),
+            "amount": data.order.price,
+            "details": order_number,
+            "cardholder": {
+                "phone_number": data.order.contact.phone,
+                "name": data.order.contact.name,
+                "email": data.order.contact.email,
+            },
+        }
+
+        headers = {"Content-Type": "application/json", "x-api-key": os.environ.get("partner_key")}
+
+        tappay_res = requests.post(tappay_url, json=tappay_payload, headers=headers)
+        tappay_result = tappay_res.json()
+
+        #  payments 紀錄
+        cursor.execute(
+            """
+            INSERT INTO payments
+            (order_id, status, message, transaction_id, amount, raw_response)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (
+                order_id,
+                tappay_result.get("status"),
+                tappay_result.get("msg"),
+                tappay_result.get("rec_trade_id"),
+                data.order.price,
+                json.dumps(tappay_result),
+            ),
+        )
+
+        # 付款成功
+        if tappay_result.get("status") == 0:
+            cursor.execute(
+                "UPDATE orders SET status = 'PAID' WHERE id = %s", (order_id,)
+            )
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "data": {
+                        "number": order_number,
+                        "payment": {"status": 0, "message": "付款成功"},
+                    }
+                },
+            )
+
+        # 付款失敗
+        return JSONResponse(
+            status_code=200,
+            content={
+                "data": {
+                    "number": order_number,
+                    "payment": {
+                        "status": tappay_result.get("status"),
+                        "message": tappay_result.get("msg"),
+                    },
+                }
+            },
+        )
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+    finally:
+        cursor.close()
+        cnx.close()
+
+
+@app.get("/api/order/{orderNumber}")
+async def order_id(request: Request, orderNumber: int):
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+    try:
+        # 確認是否登入
+        auth_header = request.headers.get("Authorization")
+        try:
+            if not auth_header:
+                return JSONResponse(
+                    status_code=403,
+                    content={"error": True, "message": "未登入系統，拒絕存取"},
+                )
+
+            # 取得user_id
+            token = auth_header.split(" ")[1]
+            payload = jwt.decode(token, secert, algorithms="HS256")
+            user_id = payload["id"]
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=403,
+                content={"error": True, "message": "未登入系統，拒絕存取"},
+            )
+
+        if orderNumber:
+            cursor.execute(
+                "SELECT "
+                "orders.order_number AS order_number,"
+                "orders.price AS price,"
+                "attractions.id AS attraction_id,"
+                "attractions.name AS attraction_name,"
+                "attractions.address AS attraction_address,"
+                "attraction_images.url AS image_url,"
+                "orders.date AS date,"
+                "orders.time AS time,"
+                "orders.contact_name AS contact_name,"
+                "orders.contact_email AS contact_email,"
+                "orders.contact_phone AS contact_phone "
+                "FROM orders "
+                "INNER JOIN attractions ON orders.attraction_id = attractions.id "
+                "INNER JOIN attraction_images ON attractions.id = attraction_images.attraction_id "
+                "WHERE orders.order_number = %s "
+                "LIMIT 1;",
+                (orderNumber,),
+            )
+            data = cursor.fetchone()
+
+            if not data:
+                return JSONResponse(
+                    status_code=200,
+                    content={"data":None},
+                )
+
+            result = {
+                "data": {
+                    "number": data["order_number"],
+                    "price": data["price"],
+                    "trip": {
+                        "attraction": {
+                            "id": data["attraction_id"],
+                            "name": data["attraction_name"],
+                            "address": data["attraction_address"],
+                            "image": data["image_url"],
+                        },
+                        "date": str(data["date"]),
+                        "time": data["time"],
+                    },
+                    "contact": {
+                        "name": data["contact_name"],
+                        "email": data["contact_email"],
+                        "phone": data["contact_phone"],
+                    },
+                    "status": 1,
+                }
+            }
+
+            return JSONResponse(
+                status_code=200,
+                content=result,
+            )
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
     finally:
         cursor.close()
         cnx.close()

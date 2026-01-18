@@ -183,13 +183,22 @@ async function authorization(){
 async function authRender() {
   const isAuth = await authorization();
   const bookingPage = window.location.pathname === "/booking";
+  const thankPage = window.location.pathname === "/thankyou"
   if(bookingPage){
     if(!isAuth){
       window.location.href="/"
       return
     }
     renderBooking();
+  };
+  if(thankPage){
+    if(!isAuth){
+      window.location.href="/"
+      return
+    }
+    renderThankyou();
   }
+
 }
 
 authRender();
@@ -795,8 +804,7 @@ async function fetchBooking(){
     }
 }
   // 插入預定頁面
-async function bookingHtml() {
-  const data = await fetchBooking()
+async function bookingHtml(data) {
   const main = document.querySelector(".main")
   if (!data){
     main.innerHTML = `
@@ -811,7 +819,6 @@ async function bookingHtml() {
     `
     return false
   }
-  const attraction_id = data.attraction.id;
   const attraction_name = data.attraction.name;
   const attraction_address = data.attraction.address;
   const attraction_image = data.attraction.image;
@@ -864,18 +871,16 @@ async function bookingHtml() {
         <div class="booking_form_visa_text">信用卡付款資訊</div>
       </div>
       <div class="booking_form_visa_number">
-        <label class="booking_form_visa_number_lable" for="bookingFormVisaNumberImput">卡片號碼：</label>
-        <input class="booking_form_visa_number_imput" id="bookingFormVisaNumberImput" type="tel" maxlength="19" autocomplete="cc-number" placeholder="**** **** **** ****">
+        <label class="booking_form_visa_number_lable" >卡片號碼：</label>
+        <div class="booking_form_visa_number_imput" id="card-number"></div>
       </div>
       <div class="booking_form_visa_exp">
-        <label class="booking_form_visa_exp_lable" for="bookingFormVisaExpImput">過期時間：</label>
-        <input class="booking_form_visa_exp_imput" id="bookingFormVisaExpImput" type="tel"  maxlength="7"
-          autocomplete="cc-exp" placeholder="MM / YY">
+        <label class="booking_form_visa_exp_lable">過期時間：</label>
+        <div class="booking_form_visa_exp_imput" id="card-expiration-date"></div>
       </div>
       <div class="booking_form_visa_cvv">
-        <label class="booking_form_visa_cvv_lable" for="bookingFormVisaCvvImput">驗證密碼：</label>
-        <input class="booking_form_visa_cvv_imput" id="bookingFormVisaCvvImput" type="tel" maxlength="4"
-          autocomplete="cc-csc" placeholder="CVV">
+        <label class="booking_form_visa_cvv_lable">驗證密碼：</label>
+        <div class="booking_form_visa_cvv_imput" id="card-ccv"></div>
       </div>
     </div>
     <hr>
@@ -892,21 +897,7 @@ async function bookingHtml() {
   return true
 }
   //  綁定預定事件
-function bookingEvent(){
-  // exp 輸入設定
-  const expirationInput = document.getElementById("bookingFormVisaExpImput");
-  if (!expirationInput) return;
-  expirationInput.addEventListener("input", (e) => {
-    let value = e.target.value;
-    value = value.replace(/\D/g, "");
-    if (value.length > 7) {
-      value = value.slice(0, 7);
-    }
-    if (value.length >= 3) {
-      value = value.slice(0, 2) + " / " + value.slice(2);
-    }
-    e.target.value = value;
-  });
+function bookingEvent(data){
   // 刪除按鈕
     const bookingDeleteBtn = document.getElementById("bookingDeleteBtn");
     if (!bookingDeleteBtn) return;
@@ -915,16 +906,59 @@ function bookingEvent(){
       openLoginDialog();
       return
       }
-      deleteBooking();
+      const isDelete = deleteBooking();
+      if(isDelete){location.reload();};
     });
+    // 表單事件
+    const bookingForm = document.getElementById("booking_form");
 
+    bookingForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const bookingName = document.getElementById("bookingFormInfoNameImput").value;
+    const bookingEmail = document.getElementById("bookingFormInfoEmailImput").value;
+    const bookingPhone = document.getElementById("bookingFormInfoPhoneImput").value;
+    
+    // 確認聯絡資料是否正確 
+    if (!bookingName) {
+      alert("請填寫聯絡姓名");
+      return;
+    };
+    if (!bookingEmail) {
+      alert("請填寫聯絡信箱");
+      return;
+    };
+    if (!bookingPhone) {
+      alert("請填寫聯絡電話");
+      return;
+    };
+    
+    // 確認付款資料是否正確
+    const tappayStatus = TPDirect.card.getTappayFieldsStatus();
+    if (tappayStatus.canGetPrime === false) {
+        alert("請填寫完整付款資料");
+        return
+    }
+
+    // 呼叫 TapPay 取得 prime
+    TPDirect.card.getPrime(async function (result) {
+      if (result.status !== 0) {
+        alert("信用卡資料錯誤，請確認");
+        return;
+      }
+      const prime = result.card.prime;
+      await createOrder(prime, bookingName, bookingEmail, bookingPhone,data);
+    });
+  });
 }
   // 渲染預定畫面
 async function renderBooking(){
-  const booked = await bookingHtml()
+  const data = await fetchBooking()
+  const booked = await bookingHtml(data)
   if(booked){
-    bookingEvent();
-  } 
+      initToppay();
+      bookingEvent(data);
+  }; 
 }
 
 // 刪除預定資料
@@ -948,11 +982,132 @@ async function deleteBooking() {
       return
     }
     if(result.ok){
-      alert = "預定已刪除"
-      location.reload();
+      return {isDelete:true}      
     }
   }catch(error){
     console.log("deleteBookingError:",error);
   }
   
 }
+
+// Toppay
+function initToppay(){
+  const appId = 166486;
+  const appKey = "app_R1FNHXMT4XfHf1uZgPBHUG1ZyTFwe5HuAvrIWewO4Ed73mYPp99pMuQaZc3u"
+  TPDirect.setupSDK(appId, appKey, 'sandbox');
+  
+  TPDirect.card.setup({
+    fields: {
+        number: {
+            element: document.getElementById('card-number'),
+            placeholder: '**** **** **** ****'
+        },
+        expirationDate: {
+            element: document.getElementById('card-expiration-date'),
+            placeholder: 'MM / YY'
+        },
+        ccv: {
+            element: document.getElementById('card-ccv'),
+            placeholder: 'CCV'
+        }
+    },
+    styles: {
+        'input': {
+                'font-family': '"Noto Sans TC", sans-serif',
+                'font-weight': '500',
+                'font-style': 'Medium',
+                'font-size': '16px',
+                'line-height': '16px',
+                'letter-spacing': '0%',
+                'vertical-align': 'middle',
+                'color': '#000000'
+
+        },
+        '::placeholder': {
+            'color':'#757575'
+        },
+        '.invalid': {
+            'border-color': 'red'
+        },
+    },
+  });
+  return true;
+};
+// Oder
+async function createOrder(prime, bookingName, bookingEmail, bookingPhone,data){
+    const url = "/api/orders";
+    const attraction_id = data.attraction.id;
+    const attraction_name = data.attraction.name;
+    const attraction_address = data.attraction.address;
+    const attraction_image = data.attraction.image;
+    const date = data.date;
+    const time = data.time;
+    const price = data.price;
+
+  try{
+    const res = await fetch(url,{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({
+        "prime": prime,
+        "order": {
+          "price": price,
+          "trip": {
+            "attraction": {
+              "id": attraction_id,
+              "name": attraction_name,
+              "address": attraction_address,
+              "image": attraction_image
+            },
+            "date": date,
+            "time": time
+          },
+          "contact": {
+            "name": bookingName,
+            "email": bookingEmail,
+            "phone": bookingPhone
+          }
+        }
+      })
+    });
+    const result = await res.json()
+    if(result.error){
+      console.log("createOrder:",error);
+      if(result.message ==="未登入系統，拒絕存取"){
+        openLoginDialog();
+        return
+      }
+      if(result.message ==="訂單建立失敗"){
+        alert("訂單建立失敗，請確認輸入資料是否正確");
+        return
+      }
+    }
+    if(result.data){
+    deleteBooking();
+    const order_number = result.data.number
+    window.location.href = `/thankyou?number=${order_number}`;
+    };
+  }catch(error){
+    console.log("createOrder:",error);
+  }
+
+}
+
+// Thankyou
+function renderThankyou(){
+  const params = new URLSearchParams(window.location.search);
+  const orderNumber = params.get("number");
+  const thankyouOrderNumber = document.querySelector(".thankyou_ordernumber");
+  const thankyouBtn = document.querySelector(".thankyou_btn");
+  if (!orderNumber) {
+    thankyouOrderNumber.textContent = "查無訂單";
+    return;
+  }
+  thankyouOrderNumber.textContent = orderNumber;
+  thankyouBtn.addEventListener("click",()=>{
+    window.location.href = "/"
+  })
+};
