@@ -835,7 +835,7 @@ async def create_order(request: Request, data: OrderRequest):
 
 
 @app.get("/api/order/{orderNumber}")
-async def attraction_id(request: Request, orderNumber: int):
+async def order_id(request: Request, orderNumber: int):
     cnx = get_db()
     cursor = cnx.cursor(dictionary=True)
     try:
