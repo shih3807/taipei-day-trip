@@ -40,22 +40,22 @@ secert = os.environ.get("TOKEN_SECRET")
 # Static Pages (Never Modify Code in this Block)
 @app.get("/", include_in_schema=False)
 async def index(request: Request):
-    return FileResponse("./static/index.html", media_type="text/html")
+    return FileResponse("./static/templates/index.html", media_type="text/html")
 
 
 @app.get("/attraction/{id}", include_in_schema=False)
 async def attraction(request: Request, id: int):
-    return FileResponse("./static/attraction.html", media_type="text/html")
+    return FileResponse("./static/templates/attraction.html", media_type="text/html")
 
 
 @app.get("/booking", include_in_schema=False)
 async def booking(request: Request):
-    return FileResponse("./static/booking.html", media_type="text/html")
+    return FileResponse("./static/templates/booking.html", media_type="text/html")
 
 
 @app.get("/thankyou", include_in_schema=False)
 async def thankyou(request: Request):
-    return FileResponse("./static/thankyou.html", media_type="text/html")
+    return FileResponse("./static/templates/thankyou.html", media_type="text/html")
 
 
 def add_images(information, cursor):
@@ -377,7 +377,6 @@ async def singup(request: Request, data: SingupRequest):
 
         salt = bcrypt.gensalt()
         hash_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-        print(hash_password)
 
         cursor.execute(
             "INSERT INTO users(name, email, password) VALUES(%s, %s, %s)",
