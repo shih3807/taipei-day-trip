@@ -116,7 +116,6 @@ export const navView = {
 
 export const navController = {
   async init(){
-    await AuthController.init();
     navView.updateLoginButton();
     navView.bindLoginBtn();
     navView.bindBookingBtn();

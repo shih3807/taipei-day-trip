@@ -156,7 +156,6 @@ export const AuthController = {
         const singupName = document.getElementById("singupName");
         const singupEmail = document.getElementById("singupEmail");
         const singupPassword = document.getElementById("singupPassword");
-
         signupForm?.addEventListener("submit",async(e) =>{
         e.preventDefault();
         const errorMsg = document.querySelector(".dialog_main_containeer_msg")
