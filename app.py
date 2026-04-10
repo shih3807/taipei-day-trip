@@ -12,7 +12,6 @@ load_dotenv()
 
 app = FastAPI()
 
-load_dotenv()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
